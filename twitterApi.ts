@@ -118,7 +118,7 @@ export class TwitterApi {
       let request = new Request(this.baseUrl + url, {
         method,
         headers,
-        body: options
+        body: JSON.stringify(options)
       });
     }
 
