@@ -9,8 +9,8 @@ interface Keys {
 }
 
 interface Settings {
-  subDomain: 'api' | 'upload'
-  apiVersion: '1.1' | '2';
+  subDomain?: 'api' | 'upload'
+  apiVersion?: '1.1' | '2';
 }
 
 interface Options {
