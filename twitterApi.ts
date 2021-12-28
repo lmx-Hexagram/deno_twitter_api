@@ -109,10 +109,18 @@ export class TwitterApi {
       "Content-Type": "application/json"
     });
 
-    let request = new Request(this.baseUrl + url + "?" + new URLSearchParams(options).toString(), {
-      method,
-      headers,
-    });
+    if (method === 'GET') {
+      let request = new Request(this.baseUrl + url + "?" + new URLSearchParams(options).toString(), {
+        method,
+        headers,
+      });
+    } else {
+      let request = new Request(this.baseUrl + url, {
+        method,
+        headers,
+        body: options
+      });
+    }
 
     // console.log(authHeader)
 
