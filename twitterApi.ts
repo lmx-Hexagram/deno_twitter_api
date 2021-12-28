@@ -9,6 +9,7 @@ interface Keys {
 }
 
 interface Settings {
+  subDomain: 'api' | 'upload'
   apiVersion: '1.1' | '2';
 }
 
@@ -43,8 +44,8 @@ export class TwitterApi {
     this.oauth_consumer_secret = keys.consumerApiSecret;
     this.oauth_token = keys.accessToken;
     this.oauth_token_secret = keys.accessTokenSecret;
-    this.settings = Object.assign({apiVersion: '1.1'}, settings);
-    this.baseUrl = 'https://api.twitter.com/' + this.settings.apiVersion + '/';
+    this.settings = Object.assign({ apiVersion: '1.1', subDomain: 'api' }, settings);
+    this.baseUrl = `https://${this.settings.subDomain}.twitter.com/${this.settings.apiVersion}/`;
   }
 
   getBaseUrl(): string {
@@ -79,22 +80,22 @@ export class TwitterApi {
     return await this.request("POST", url, options);
   }
 
-    /** 
-   * Makes a post request to the twitter api 
-   * The [url] should not include `https://api.twitter.com/1.1/`
-   * 
-   * Good: `lists/statuses.json`
-   * 
-   * Bad: `https://api.twitter.com/1.1/lists/statuses.json`
-  */
-  async request( method: "GET" | "POST", url: string, options?: Options): Promise<Response> {
-    if(options == null) options = {};
+  /** 
+ * Makes a post request to the twitter api 
+ * The [url] should not include `https://api.twitter.com/1.1/`
+ * 
+ * Good: `lists/statuses.json`
+ * 
+ * Bad: `https://api.twitter.com/1.1/lists/statuses.json`
+*/
+  async request(method: "GET" | "POST", url: string, options?: Options): Promise<Response> {
+    if (options == null) options = {};
 
     let oauth_nonce: string = this.generateNonce();
     let oauth_timestamp: string = this.getCurrentTimestamp();
     let oauth_signature: string = this.createSignature(
-      oauth_nonce, 
-      oauth_timestamp, 
+      oauth_nonce,
+      oauth_timestamp,
       {
         options,
         method,
@@ -123,8 +124,8 @@ export class TwitterApi {
   }
 
   private createSignature(
-    oauth_nonce: string, 
-    oauth_timestamp: string, 
+    oauth_nonce: string,
+    oauth_timestamp: string,
     { options, method, url }: { options: Options, method: "GET" | "POST", url: string }
   ): string {
     let signatureString: string = "";
@@ -139,7 +140,7 @@ export class TwitterApi {
       ...options,
     };
 
-    for(let k in params) {
+    for (let k in params) {
       let v = params[k];
       paramPairs.push(this.percentEncode(k) + "=" + this.percentEncode(v));
     }
@@ -161,8 +162,8 @@ export class TwitterApi {
   }
 
   private createAuthHeader(
-    oauth_nonce: string, 
-    oauth_timestamp: string, 
+    oauth_nonce: string,
+    oauth_timestamp: string,
     oauth_signature: string
   ): string {
     return [
@@ -188,28 +189,28 @@ export class TwitterApi {
     let encodedVal: string = encodeURIComponent(val);
 
     // Adjust for RFC 3986 section 2.2 Reserved Characters 
-    let reservedChars: {match: RegExp, replace: string}[] = [
-      { match: /\!/g, replace: "%21"},
-      { match: /\#/g, replace: "%23"},
-      { match: /\$/g, replace: "%24"},
-      { match: /\&/g, replace: "%26"},
-      { match: /\'/g, replace: "%27"},
-      { match: /\(/g, replace: "%28"},
-      { match: /\)/g, replace: "%29"},
-      { match: /\*/g, replace: "%2A"},
-      { match: /\+/g, replace: "%2B"},
-      { match: /\,/g, replace: "%2C"},
-      { match: /\//g, replace: "%2F"},
-      { match: /\:/g, replace: "%3A"},
-      { match: /\;/g, replace: "%3B"},
-      { match: /\=/g, replace: "%3D"},
-      { match: /\?/g, replace: "%3F"},
-      { match: /\@/g, replace: "%40"},
-      { match: /\[/g, replace: "%5B"},
-      { match: /\]/g, replace: "%5D"},
+    let reservedChars: { match: RegExp, replace: string }[] = [
+      { match: /\!/g, replace: "%21" },
+      { match: /\#/g, replace: "%23" },
+      { match: /\$/g, replace: "%24" },
+      { match: /\&/g, replace: "%26" },
+      { match: /\'/g, replace: "%27" },
+      { match: /\(/g, replace: "%28" },
+      { match: /\)/g, replace: "%29" },
+      { match: /\*/g, replace: "%2A" },
+      { match: /\+/g, replace: "%2B" },
+      { match: /\,/g, replace: "%2C" },
+      { match: /\//g, replace: "%2F" },
+      { match: /\:/g, replace: "%3A" },
+      { match: /\;/g, replace: "%3B" },
+      { match: /\=/g, replace: "%3D" },
+      { match: /\?/g, replace: "%3F" },
+      { match: /\@/g, replace: "%40" },
+      { match: /\[/g, replace: "%5B" },
+      { match: /\]/g, replace: "%5D" },
     ];
 
-    encodedVal = reservedChars.reduce((tot, {match, replace}) => {
+    encodedVal = reservedChars.reduce((tot, { match, replace }) => {
       return tot.replace(match, replace);
     }, encodedVal);
 
